@@ -1,11 +1,6 @@
 import numpy as np
 import astropy.units as u
-
-try:
-  # Something to make life fun...
-  from pratchett import HEX
-except:
-  import sys as HEX
+import sys
 
 """
     A simple python class to handle observed pulsations and pulsation patterns...
@@ -37,7 +32,7 @@ class pulsations(object):
             frequency, e_frequency, period, e_period, amplitude, e_amplitude, phase, e_phase, sn, sequence = self.read_spacings_file(filename)
         
         elif(('_scargle.dat' in filename) | (filetype == 'scargle')):
-            HEX.exit('pulsations.__init__: cannot read in "scargle files" yet... If you have some time to write the function? *smiles hopefully*')
+            sys.exit('pulsations.__init__: cannot read in "scargle files" yet... If you have some time to write the function? *smiles hopefully*')
         
         # The usual observables
         self.frequency = frequency
