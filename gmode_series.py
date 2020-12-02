@@ -269,7 +269,7 @@ class asymptotic(object):
         else:
             if(np.amin(self.spin) < 0.):
                 # Pulsation frequencies -- in the unit of 1/Pi0
-                puls_freq = np.sqrt(np.interp(0.,self.spin,self.lam)) / Pi0*(self.nvals+alpha_g)
+                puls_freq = np.sqrt(np.interp(0.,self.spin,self.lam)) / (Pi0*(self.nvals+alpha_g))
             else:
                 # These are likely r-modes -- not present in a non-rotating star!
                 puls_freq = self.nvals*np.nan
@@ -355,7 +355,7 @@ class asymptotic(object):
         else:
             if(np.amin(self.spin) < 0.):
                 # Pulsation frequencies -- in the unit of 1/Pi0
-                puls_freq = np.sqrt(np.interp(0.,self.spin,self.lam)) / Pi0*(self.nvals+alpha_g)
+                puls_freq = np.sqrt(np.interp(0.,self.spin,self.lam)) / (Pi0*(self.nvals+alpha_g))
             else:
                 # These are likely r-modes -- not present in a non-rotating star!
                 puls_freq = self.nvals*np.nan
@@ -442,7 +442,7 @@ class asymptotic(object):
                 ind_min_rot = np.argmin(frot_sort[evaluated])
                 rs = rad_sort[evaluated][ind_min_rot]
             
-            frots = np.interp(rs, rad_sort, frot_sort) * frot_sort.unit
+            frots = np.interp(rs, rad_sort, frot_sort.value) * frot_sort.unit
             freqs = self.uniform_pattern(frots,Pi0, unit='cycle_per_day')
         
         else:
@@ -468,12 +468,11 @@ class asymptotic(object):
             radial_valid_sort = radial_n[valid_radial_n][ind_radial_sort]   
             
             # Mapping the results onto the input radial orders self.nvals
-            puls_freq = np.interp(self.nvals,radial_valid_sort,freqs_valid_sort) * freqs_valid_sort.unit
+            puls_freq = np.interp(self.nvals,radial_valid_sort,freqs_valid_sort.value) * freqs_valid_sort.unit
             
             # Setting the values which lie outside of the computable range to "nan"
             out_of_range = ~np.r_[(self.nvals >= np.amin(radial_valid_sort)) & (self.nvals <= np.amax(radial_valid_sort))]
             puls_freq[out_of_range] = np.nan
-            
         else:
             puls_freq = self.nvals*np.nan * freqs.unit
             

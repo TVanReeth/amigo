@@ -38,8 +38,11 @@ class stellar_model(object):
         brunt2_sort = brunt2_profile[ind_sort]
         
         # The square root of N^2
-        brunt2_sort[brunt2_sort < 0.] = 0.
+        brunt2_sort[(brunt2_sort < 0.) | ~np.isfinite(brunt2_sort)] = 0.
         brunt_sort = np.sqrt(brunt2_sort)
+        
+        # Avoiding unnecessary nans
+        rad_sort[0] = 0.001*rad_sort[1]
         
         self.radius = rad_sort
         self.brunt2 = brunt2_sort
@@ -79,7 +82,7 @@ class stellar_model(object):
     
     
     
-    def rotation_profile_brunt(self,frot_s, delta_f, x_known=[], known_rot=[]):
+    def rotation_profile_brunt(self,frot_s, delta_f, x_known=[], known_rot=[], with_rs=False):
         """
             Computing the rotation profile following Eq.10 in Van Reeth et al. 2018, A&A 618, A24.
             
@@ -126,6 +129,43 @@ class stellar_model(object):
             
             frot_prof = frot_s * ( 1. + (delta_f * (diffrot_prof - frs) / (diffrot_prof[0]-frs)) )
         
-        return frot_prof
+        if(with_rs):
+            return frot_prof,rs
+        else:
+            return frot_prof
 
     
+    def omegacrit_scale(self):
+        """
+            Calculate the local "critical" scaling rotation rate from a non-rotating stellar model, given a mass and (corresponding) radial coordinate, in cgs.
+            Here, we follow the "Keplerian definition", but as given by Mathis & Prat (2019).
+            
+            Parameters:
+                mass (float): stellar mass coordinate(s) in grams
+                radius (float): corresponding radial coordinate(s) in cm
+            Out:
+                omk (float): the critical ("Keplerian") rotation rate (in rad s^-1)
+        """
+        
+        G = 6.6743 * 10.**(-8.)
+        omk = np.sqrt(G*self.mass/(self.radius**3.))
+
+        return omk
+    
+
+    def omegacrit_roche(self):
+        """
+            Calculate the local critical rotation rate from a non-rotating stellar model, given a mass and (corresponding) radial coordinate, in cgs.
+            Here, we follow the "Roche model definition", but as given by Bouabid et al. (2013).
+            
+            Parameters:
+                mass (float): stellar mass coordinate(s) in grams
+                radius (float): corresponding radial coordinate(s) in cm
+            Out:
+                omk (float): the critical ("Roche") rotation rate (in rad s^-1)
+        """
+        
+        G = 6.6743 * 10.**(-8.)
+        omk = np.sqrt(8.*G*self.mass/(27.*self.radius**3.))
+        
+        return omk
