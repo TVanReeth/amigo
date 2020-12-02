@@ -2,8 +2,8 @@ import itertools as it
 import numpy as np
 import sobol_seq
 
-from stellar_model import stellar_model
-from gmode_series import asymptotic
+from amigo.stellar_model import stellar_model
+from amigo.gmode_series import asymptotic
 
 """
     A module with several subroutines to facilitate the forward modelling of pulsating sdtars. For now, this is
@@ -14,7 +14,7 @@ from gmode_series import asymptotic
             timothy.vanreeth@kuleuven.be
 """
 
-def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8',return_structured=True,**kwargs):
+def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8',return_structured=True,include_raw=False,**kwargs):
     """ 
         A routines to sample a (bound) parameter space.
         
@@ -41,6 +41,9 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
             return_structured: boolean
                         If the preferred output is a structured numpy array (master_sample['i_parameter_name']) rather than a normal
                         array (master_sample[:,i_parameter]), return_structured is True (=default).
+            include_raw: boolean
+                        If true, include the non-rescaled Sobol sequence array in the output (in the same format as the scaled 
+                        parameter list). False = default.
             **kwargs:   parameters for the different sampling methods (Nrandom, Nsobol, Nregulars: how many models are required; 
                         regular_step: step size in a regular grid. Alternative for Nregulars).
         
@@ -108,24 +111,34 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
     
     # Merging the subsamples into a merged sample, combining them with itertools.product()
     merged_sample = list(it.product(sobol_sample,regular_sample,random_sample))
-    print(merged_sample[1])
+    
     # Now... flattening the different parameter combinations into lists, and sorting them
     flat_index = np.argsort(np.array(sobol_selection + regular_selection + random_selection,dtype=int))
     
     if(return_structured):
         #master_sample = [np.hstack(*args)[flat_index] for args in merged_sample]
-        master_sample = np.array([tuple(np.hstack(args)[flat_index]) for args in merged_sample],dtype=[(parameter,partype) for parameter,partype in zip(parameters,paramtypes)])
+        parameters = ['index']+parameters
+        paramtypes = ['i4']+paramtypes
+        master_sample = np.array([tuple([int(iarg+1)]+list(np.hstack(args)[flat_index])) for iarg,args in enumerate(merged_sample)],dtype=[(parameter,partype) for parameter,partype in zip(parameters,paramtypes)])
         
+        if(include_raw):
+            raw_sample = np.array([tuple([int(iarg+1)]+list(np.hstack(args)[flat_index])) for iarg,args in enumerate(merged_sample)],dtype=[(parameter,partype) for parameter,partype in zip(parameters,paramtypes)])
         # rescaling the normalised values so (0,1) --> (minbound,maxbound)
-        for parameter,imin,imax in zip(parameters,minbound,maxbound):
+        for parameter,imin,imax in zip(parameters[1:],minbound,maxbound):
             master_sample[parameter] = master_sample[parameter]*(imax-imin) + imin
     else:
-        master_sample = [np.hstack(*args)[flat_index] for args in merged_sample]
+        if(include_raw):
+            raw_sample = [np.array([int(iarg+1)]+list(np.hstack(args)[flat_index])) for iarg,args in enumerate(merged_sample)]
+        master_sample = [np.array([int(iarg+1)]+list(np.hstack(args)[flat_index])) for iarg,args in enumerate(merged_sample)]
         
         # rescaling the normalised values so (0,1) --> (minbound,maxbound)
         for ipar,imin,imax in zip(np.arange(len(parameters)),minbound,maxbound):
-            master_sample[:,ipar] = master_sample[:,ipar]*(imax-imin) + imin
-    return master_sample
+            master_sample[:,ipar+1] = master_sample[:,ipar+1]*(imax-imin) + imin
+    
+    if(include_raw):
+        return master_sample, raw_sample
+    else:
+        return master_sample
 
 
 
@@ -135,7 +148,7 @@ def sobol_sequence(lensobol,Nsobol):
 
         Parameters:
             lensobol: integer
-                      The number of dimensiona for the sobol numbers
+                      The number of dimensions for the sobol numbers
             Nsobol:   integer
                       The number of sobol numbers that have to be generated.
         
@@ -150,7 +163,7 @@ def sobol_sequence(lensobol,Nsobol):
 
 
 def random(lenrand,Nrand):
-      """
+    """
         Generate a random set of samples, assuming a uniform distribution within the parameter (sub)space.
 
         Parameters:
