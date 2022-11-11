@@ -31,4 +31,4 @@ In the subdirectory /demo you can find:
 - an example of a file with two period-spacing patterns, used in the demo.
 - an additional python script (demo_plot_pattern.py) which illustrates how the code can be used to calculate and plot a single, specified g-mode period-spacing pattern.
 
-An introduction to the physics implemented in AMIGO can be found in Van Reeth et al.(2016; https://ui.adsabs.harvard.edu/abs/2016A%26A...593A.120V/abstract). Please note that when this manuscript was written, the asymptotic spacings of g-mode patterns were still expressed as $\Delta \Pi_{l} = \Pi_0 / \sqrt{l(l+1)}$ rather than just the buoyancy travel time $\Pi_0$ (as is done in AMIGO).
+An introduction to the physics implemented in AMIGO can be found in Van Reeth et al.(2016; https://ui.adsabs.harvard.edu/abs/2016A%26A...593A.120V/abstract). Please note that when this manuscript was written, the asymptotic spacings of g-mode patterns were still expressed using the parameter $\Delta \Pi_{l} = \Pi_0 / \sqrt{l(l+1)}$ rather than just using the buoyancy travel time $\Pi_0$ (as is done in AMIGO), where $$\Pi_0 = \frac{2\pi^2}{\int_{r_1}^{r_2}\frac{N}{r}\mathrm{d}r}.$$
