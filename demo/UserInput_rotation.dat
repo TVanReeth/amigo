@@ -1,0 +1,26 @@
+
+### dependencies on other software
+gyre_dir = /STER/timothyv/Bin/gyre-52/                                                         # GYRE v5.x or v6.x installation directory
+
+
+### information on the observed target
+star = KIC0322883                                                                              # star name
+patterns = /lhome/timothyv/Bin/python/amigo/demo/kepler03228863_spacings.amigo                 # absolute path to the file with detected period spacings
+
+
+### numerical settings for the calculations
+nthreads = 1                                                                                   # the number of CPU threads used in the calculations
+optimisation_method = grid                                                                     # method used to sample and evaluate the parameter space (grid or lmfit)
+                                                                                               #      grid:  the parameter space is sampled on a grid according to the values given below
+                                                                                               #      lmfit: the optimisation is done using the Levenberg-Marquardt algorithm, as 
+                                                                                               #             implemented in lmfit in the 'leastsq' routine
+
+
+### parameters describing the boundaries of the parameters space and (when optimisation_method = grid) the sampling.
+frot_bnd = 0.00  2.50  0.0025                                                                  # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+Pi0_bnd  = 2300  5600  20                                                                      # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+
+
+### mode identifications to be evaluated (in the example below: (k,m) = (0,1) and (-2,-1))
+kvals = 0  -2                                                                                  # meridional degrees of the calculated asymptotic models
+mvals = 1  -1                                                                                  # the (corresponding) azimuthal orders of the calculated asymptotic models
