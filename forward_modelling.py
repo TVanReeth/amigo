@@ -1,14 +1,17 @@
+#!/usr/bin/env python3
+#
+# File: forward_modelling.py
+# Author: Timothy Van Reeth <timothy.vanreeth@kuleuven.be>
+# License: GPL-3+
+# Description: A module with several subroutines to facilitate the forward modelling of pulsating stars. For now, this is
+#              a very simple module, only focusing on the sampling of the parameter space.
+
 import itertools as it
 import numpy as np
-import sobol_seq
-
-from amigo.stellar_model import stellar_model
-from amigo.gmode_series import asymptotic
+import sys
 
 """
-    A module with several subroutines to facilitate the forward modelling of pulsating sdtars. For now, this is
-    a very simple module, only focusing on the sampling of the parameter space and providing a basic merit function
-    for model evaluation.
+    
     
     author: Timothy Van Reeth (KU Leuven)
             timothy.vanreeth@kuleuven.be
@@ -34,22 +37,21 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
             method:     string or list (of strings)
                         The method(s) to be used to sample the parameter space. If a single method (string) is provided, 
                         it will be applied to the entire parameter space. If a list f methods is provided, a single method 
-                        per parameter has to be specified. The available options are 'regular' (= a regular grid), 'sobol' (sequence)
-                        and 'random'. Default = 'regular'.
+                        per parameter has to be specified. The available options are 'regular' (= a regular grid) and 'random'. Default = 'regular'.
             parameter formats: string
                         The format of the different parameters. By default, it is assumed that all parameter are floats 'f8'.
             return_structured: boolean
                         If the preferred output is a structured numpy array (master_sample['i_parameter_name']) rather than a normal
                         array (master_sample[:,i_parameter]), return_structured is True (=default).
             include_raw: boolean
-                        If true, include the non-rescaled Sobol sequence array in the output (in the same format as the scaled 
+                        If true, include the non-rescaled array in the output (in the same format as the scaled 
                         parameter list). False = default.
-            **kwargs:   parameters for the different sampling methods (Nrandom, Nsobol, Nregulars: how many models are required; 
+            **kwargs:   parameters for the different sampling methods (Nrandom, Nregulars: how many models are required; 
                         regular_step: step size in a regular grid. Alternative for Nregulars).
         
         Returns:
             master_sample: (structured?) numpy array
-                        the generated samples in the parameter space.
+                           the generated samples in the parameter space.
     """
     
     # Which parameters do you need?
@@ -62,7 +64,7 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
         sys.exit("forward_modelling.sampling: something is wrong with the formats 'parameter_formats' given for the input parameters.")
         
     # So... How do you want to do this?
-    available_methods = ['sobol','regular','random']
+    available_methods = ['regular','random']
     if(type(method) == str):
         assert method in available_methods, f"Please make sure that the method used to sample the parameter space is one of {', '.join(x_unit for x_unit in available_methods)}."
         selected_methods = [method]*len(parameters)
@@ -77,9 +79,6 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
         sys.exit("forward_modelling.sampling: (one or some of) the given method(s) to sample the parameter space are not valid.")
         
     # Making sure that the required keyword arguments for the different methods are listed in **kwargs
-    if('sobol' in selected_methods):
-        assert 'Nsobol' in kwargs.keys(), "Please provide the total number of models Nsobol that has to be generated using the Sobol sequence."
-        Nsobol = kwargs['Nsobol']
     if('random' in selected_methods):
         assert 'Nrandom' in kwargs.keys(), "Please provide the total number of models Nrandom that has to be generated randomly."
         Nrand = kwargs['Nrandom']
@@ -92,16 +91,11 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
             Nregulars = 1 + np.floor((maxbound - minbound)/kwargs['regular_step'])
     
     # Creating (sub)samples for each of the possible methods, for the specified parameters for each
-    sobol_selection = [imeth for imeth,meth in enumerate(selected_methods) if meth == 'sobol']
     regular_selection = [imeth for imeth,meth in enumerate(selected_methods) if meth == 'regular']
     random_selection = [imeth for imeth,meth in enumerate(selected_methods) if meth == 'random']
     
-    if(len(sobol_selection) > 0):
-        sobol_sample = sobol_sequence(len(sobol_selection),Nsobol)
-    else:
-        sobol_sample = [[]]
     if(len(regular_selection) > 0):
-        regular_sample = regular_grid(len(regular_selection),Nregulars)
+        regular_sample = regular_grid(Nregulars)
     else:
         regular_sample = [[]]
     if(len(random_selection) > 0):
@@ -110,10 +104,10 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
         random_sample = [[]]
     
     # Merging the subsamples into a merged sample, combining them with itertools.product()
-    merged_sample = list(it.product(sobol_sample,regular_sample,random_sample))
+    merged_sample = list(it.product(regular_sample,random_sample))
     
     # Now... flattening the different parameter combinations into lists, and sorting them
-    flat_index = np.argsort(np.array(sobol_selection + regular_selection + random_selection,dtype=int))
+    flat_index = np.argsort(np.array(regular_selection + random_selection,dtype=int))
     
     if(return_structured):
         #master_sample = [np.hstack(*args)[flat_index] for args in merged_sample]
@@ -142,26 +136,6 @@ def sampling(parameters,minbound,maxbound,method='regular',parameter_formats='f8
 
 
 
-def sobol_sequence(lensobol,Nsobol):
-    """
-        Generate a sobol sequence
-
-        Parameters:
-            lensobol: integer
-                      The number of dimensions for the sobol numbers
-            Nsobol:   integer
-                      The number of sobol numbers that have to be generated.
-        
-        Returns:
-            sobol_sample: numpy array
-                      The generated sequence of sobol numbers (normalised to unity along each dimension).
-    """
-    
-    sobol_sample = sobol_seq.i4_sobol_generate(lensobol,Nsobol)
-    return sobol_sample
-
-
-
 def random(lenrand,Nrand):
     """
         Generate a random set of samples, assuming a uniform distribution within the parameter (sub)space.
@@ -174,7 +148,7 @@ def random(lenrand,Nrand):
         
         Returns:
             random_sample: numpy array
-                      The generated sequence of random numbers (normalised to unity along each dimension).
+                           The generated sequence of random numbers (normalised to unity along each dimension).
     """
     
     random_sample = np.random.rand(Nrand,lenrand)
@@ -182,22 +156,20 @@ def random(lenrand,Nrand):
 
 
 
-def regular_grid(lenregular,Nregulars):
+def regular_grid(Nregulars):
     """
         Generate a regular grid of samples.
 
         Parameters:
-            lenregular:  integer
-                         The number of dimensions for the grid
             Nregulars:   array, dtype=integer
                          The number of regularly spaced numbers that have to be generated (along each axis).
         
         Returns:
             regular_sample: numpy array
-                      The generated sequence of regularly spaced samples (normalised to unity along each dimension).
+                            The generated sequence of regularly spaced samples (normalised to unity along each dimension).
     """
     
-    args = (np.linspace(0.,1.,iregular) for iregular in Nregulars)
+    args = (np.linspace(0.,1.,iregular) for iregular in np.array(Nregulars, dtype=int))
     regular_sample = it.product(*args)
     return regular_sample
 
