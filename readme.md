@@ -23,7 +23,7 @@ To run AMIGO, you need to:
     - ensure that the path to the file with the observed g-mode patterns is complete and correct.
 - enter the terminal command: 
 
-$ python computate_rotation.py
+    $ python computate_rotation.py
 
 
 In the subdirectory /demo you can find:
