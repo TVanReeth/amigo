@@ -1,0 +1,40 @@
+
+&observations
+    starname = 'KIC03228863'                                # star name
+    patterns = './kepler03228863_spacings.amigo'            # path to the file with detected period spacings
+/
+
+
+&modes                                                      # possible mode identifications for the first observed pattern
+    k =  0                                                  # meridional degrees k of the calculated asymptotic models
+    m =  1
+/
+
+
+&modes                                                      # possible mode identifications for the first observed pattern
+    k = -2                                                  # meridional degrees k of the calculated asymptotic models
+    m = -1
+/
+
+
+&numerical
+    optimisation_method = 'lmfit'                           # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
+    diagnostic = 'spacings'
+/                                                                                              
+                                                                                              
+                  
+
+
+&star
+    Pi0 = 2300  5600  100                                   # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+/
+
+
+&rotation
+    frot = 0.0  2.5  0.005                                  # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+/
+
+
+&output
+    output_dir = './output/'                                # path to the directory in which the results will be saved (in a subdirectory <output_dir>/<starname>/)
+/
