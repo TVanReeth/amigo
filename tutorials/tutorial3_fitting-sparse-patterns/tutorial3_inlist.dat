@@ -1,0 +1,41 @@
+
+&observations
+    starname = 'HD_112429'                                  # star name
+    patterns = './HD112429_spacings.amigo'                  # path to the file with detected period spacings
+/
+
+
+&modes                                                      # possible mode identifications for the first observed pattern
+    k =  0                                                  # meridional degrees k of the calculated asymptotic models
+    m =  1
+/
+
+
+&modes                                                      # possible mode identifications for the first observed pattern
+    k = -2                                                  # meridional degrees k of the calculated asymptotic models
+    m = -1
+/
+
+
+&numerical
+    optimisation_method = 'iterative'                       # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
+    diagnostic = 'frequency'
+    use_sequence = False
+/                                                                                              
+                                                                                              
+                  
+
+
+&star
+    Pi0 = 2300  5600  20                                    # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+/
+
+
+&rotation
+    frot = 1.4  1.9  0.005                                   # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+/
+
+
+&output
+    output_dir = './output/'                                # path to the directory in which the results will be saved (in a subdirectory <output_dir>/<starname>/)
+/
