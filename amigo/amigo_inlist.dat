@@ -1,0 +1,42 @@
+
+&observations
+    starname = 'KIC0322883'                                                                          # star name
+    patterns = '/lhome/timothyv/Bin/python/amigo/amigo/demo/kepler03228863_spacings.amigo'           # absolute path to the file with detected period spacings
+/
+
+
+&modes
+    k = 0  1                                                                                         # meridional degrees of the calculated asymptotic models
+    m = 1  0                                                                                         # the (corresponding) azimuthal orders of the calculated asymptotic models
+/
+
+
+&modes
+    k = -2                                                                                           # meridional degrees of the calculated asymptotic models
+    m = -1                                                                                           # the (corresponding) azimuthal orders of the calculated asymptotic models
+/
+
+
+
+&numerical
+    optimisation_method = 'lmfit'                                                                    # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
+    diagnostic = 'spacings'
+    use_sequence = True
+/                                                                                              
+                                                                                              
+                  
+
+
+&star
+    Pi0 = 4000  5600  10                                                                             # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+/
+
+
+&rotation
+    frot = 1.13  1.66  0.001                                                                         # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+/
+
+
+&output
+
+/
