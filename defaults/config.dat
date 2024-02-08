@@ -1,1 +1,3 @@
 
+gyre_dir = /lhome/timothyv/Bin/gyre/gyre-7.0/        # GYRE v6.x or v7.x installation directory
+nthreads = 1                                         # the max. number of CPU threads used in the calculations

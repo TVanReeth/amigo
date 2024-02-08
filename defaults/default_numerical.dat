@@ -1,0 +1,5 @@
+&numerical
+    optimisation_method = 'grid'
+    diagnostic = 'spacings'
+    use_sequence = True
+/                                                                                              
