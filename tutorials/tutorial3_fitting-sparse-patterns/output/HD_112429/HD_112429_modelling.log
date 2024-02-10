@@ -1,0 +1,57 @@
+
+fitting (k,m) = (0,1) and (-2,-1) to the observed g-modes of HD_112429:
+
+Iteration 1    frot = 1.54 +/- 0.0033333333333334103; Pi0 = 4250.0 +/- 50.0
+
+    pattern 1:    min n = 19; max n = 60; range: 41
+
+    pattern 2:    min n = 18; max n = 55; range: 37
+
+
+Iteration 2    frot = 1.5333333333333334 +/- 0.006666666666666672; Pi0 = 4150.0 +/- 77.77777777777798
+
+    pattern 1:    min n = 20; max n = 61; range: 41
+
+    pattern 2:    min n = 19; max n = 59; range: 40
+
+
+Iteration 3    frot = 1.5490460157126824 +/- 0.01047512158623265; Pi0 = 4327.777777777777 +/- 111.11111111111101
+
+    pattern 1:    min n = 19; max n = 61; range: 42
+
+    pattern 2:    min n = 18; max n = 50; range: 32
+
+
+Iteration 4    frot = 1.5371941638608306 +/- 0.0049382716049382784; Pi0 = 4209.259259259259 +/- 54.32098765432087
+
+    pattern 1:    min n = 19; max n = 60; range: 41
+
+    pattern 2:    min n = 18; max n = 56; range: 38
+
+
+Iteration 5    frot = 1.5361965332335703 +/- 0.0053206966787213705; Pi0 = 4189.506172839506 +/- 62.55144032921817
+
+    pattern 1:    min n = 19; max n = 60; range: 41
+
+    pattern 2:    min n = 18; max n = 56; range: 38
+
+
+Iteration 6    frot = 1.5368616203184104 +/- 0.004877305288827942; Pi0 = 4202.674897119341 +/- 54.86968449931434
+
+    pattern 1:    min n = 19; max n = 60; range: 41
+
+    pattern 2:    min n = 18; max n = 56; range: 38
+
+
+Iteration 7    frot = 1.536418228928517 +/- 0.0053206966787213705; Pi0 = 4193.895747599451 +/- 61.45404663923182
+
+    pattern 1:    min n = 19; max n = 60; range: 41
+
+    pattern 2:    min n = 18; max n = 56; range: 38
+
+chi2_red = 331.16654821244754
+f_rot: 1.536418228928517 +/- 0.0053206966787213705 c/d
+Pi0: 4193.895747599451 +/- 61.45404663923182 s
+    alpha1: 0.9000254081200482 +/- -0.49504470630407954
+    alpha2: 1.1351349840686626 +/- 0.04323815500929351
+
