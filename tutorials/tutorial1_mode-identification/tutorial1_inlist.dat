@@ -5,7 +5,7 @@
 /
 
 
-&modes                                                      # possible mode identifications for the first observed pattern
+&modes                                                      # possible mode identifications for the (first) observed pattern
     k = 0  1                                                # meridional degrees k of the calculated asymptotic models
     m = 1  0                                                # the (corresponding) azimuthal orders m of the calculated asymptotic models
 /
@@ -14,7 +14,7 @@
 
 &numerical
     optimisation_method = 'grid'                            # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
-    diagnostic = 'spacings'
+    diagnostic = 'spacings'                                 # which diagnostic is used to evaluate the observed period-spacing patterns ('spacings' or 'frequency')
 /                                                                                              
                                                                                               
                   
@@ -31,5 +31,6 @@
 
 
 &output
+    interactive = True                                      # show the output as a Matplotlib figure rather than just saving it
     output_dir = './output/'                                # path to the directory in which the results will be saved (in a subdirectory <output_dir>/<starname>/)
 /
