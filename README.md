@@ -45,14 +45,16 @@ To install AMIGO, you need to:
    
 3. When the prerequisites are met, the git repository can be cloned into a directory
    <dir> of your choice by typing these commands into a terminal:
-a. $ cd <dir>
-b. $ git clone https://github.com/TVanReeth/amigo.git amigo
+   ```
+           $ cd <dir>
+           $ git clone https://github.com/TVanReeth/amigo.git amigo
+   ```
         
 4. Activate the python virtual environment in which you want to install the required
    python packages. To avoid possible conflicting dependencies, we advice to build and
    activate a custom environment. E.g., with conda this can be done by typing:
-        $ conda create -n amigo_py python=3.9
-        $ conda activate amigo_py
+        a. $ conda create -n amigo_py python=3.9
+        b. $ conda activate amigo_py
    
 5. Use Poetry to install the required Python packages with all their dependencies.
         $ cd amigo
