@@ -19,23 +19,25 @@
 
 &numerical
     optimisation_method = 'iterative'                       # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
-    diagnostic = 'frequency'
-    use_sequence = False
-/                                                                                              
-                                                                                              
-                  
-
+    diagnostic = 'frequency'                                # which diagnostic is used to evaluate the observed period-spacing patterns ('spacings' or 'frequency')
+    use_sequence = False                                    # do we have enough information to fill gaps in the observed pattern(s), if any?
+    sigma_sampling = 5                                      # Minimum number of projected data points that is calculated per 1-sigma error margin at the final iteration.
+    grid_scaling = 10                                       # Scaling factor for the required grid size at each iteration. At each step, the grid is centered around the current best solution, 
+                                                            # with parameter X ranges given by: 2 * sigma_sampling * grid_scaling * dX, where dX is the current grid step size for X.
+    cvg_rate = 1.5                                          # Convergence rate of the grid during the iteration. At each iteration, the parameter step size dX in the grid is decreased by this factor.
+/
 
 &star
-    Pi0 = 2300  5600  20                                    # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+    Pi0 = 2300  5600  50                                    # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
 /
 
 
 &rotation
-    frot = 1.4  1.9  0.005                                   # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+    frot = 1.4  1.9  0.01                                   # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
 /
 
 
 &output
+    interactive = True                                      # show the output as a Matplotlib figure rather than just saving it
     output_dir = './output/'                                # path to the directory in which the results will be saved (in a subdirectory <output_dir>/<starname>/)
 /
