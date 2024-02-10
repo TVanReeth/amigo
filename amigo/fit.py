@@ -518,11 +518,11 @@ def residuals(obsstar,modes,diagnostic,frot,Pi0,alpha_g=None,use_sequence=True):
     
     all_res = []
     
-    if(alpha_g is None):
-        alpha_g = 0.5
-    
     if(diagnostic == 'spacings'):
         
+        if(alpha_g is None):
+            alpha_g = 0.5
+            
         obsx, e_x, obsy, e_y = obsstar.patterns()
         
         patterns = []
@@ -547,8 +547,8 @@ def residuals(obsstar,modes,diagnostic,frot,Pi0,alpha_g=None,use_sequence=True):
         mody = []
         for mode,ialpha in zip(modes,alpha_mod):
             if(mode.kval < 0):
-                modx.append(mode.nvals[::-1])
-                mody.append(-mode.uniform_pattern(frot, Pi0, alpha_g=ialpha)[::-1])
+                modx.append(mode.nvals)
+                mody.append(-mode.uniform_pattern(frot, Pi0, alpha_g=ialpha))
             else:
                 modx.append(mode.nvals)
                 mody.append(mode.uniform_pattern(frot, Pi0, alpha_g=ialpha))
@@ -566,7 +566,7 @@ def residuals(obsstar,modes,diagnostic,frot,Pi0,alpha_g=None,use_sequence=True):
         if((min_obs >= min_mod) & (max_obs <= max_mod) & (min_delta_obs > 0)):
             mod_interp = interpolate(iobsx, imodx, imody)
             res = np.abs( (iobsy - mod_interp) / ie_y )
-        
+            
         else:
             res = np.ones(iobsx.shape) * 10.**30.
  
@@ -647,21 +647,22 @@ def estimate_radn(obsstar, modes, frot, Pi0, alpha_g=None, use_sequence=True):
     if(not use_sequence):
         est_seq = [np.array(np.linspace(0, len(ispin)-1, len(ispin)),dtype=int)
                                                            for ispin in obsspin]
-        ianchors = [np.argsort(iseq)[len(iseq)//2] for iseq in est_seq]
+       ##### ianchors = [np.argsort(iseq)[len(iseq)//2] for iseq in est_seq]
+        ianchors = [int(len(iseq)//2) for iseq in est_seq]
         
         offsets = [iradn_alpha[ianchor] 
                                for iradn_alpha,ianchor in zip(radn_ag,ianchors)]
-        anchor_radn = np.rint(np.array(offsets))
+        anchor_radn = np.array(np.floor(np.array(offsets)), dtype=int)
 
         if(alpha_g is None):
             alpha_g_est = np.array(offsets) - anchor_radn
         else:
             alpha_g_est = alpha_g * np.ones(len(obsspin))
         
-        if(np.r_[alpha_g_est < 0.].any()):
-            alpha_below_zero = np.r_[alpha_g_est < 0.]
-            alpha_g_est[alpha_below_zero] += 1
-            anchor_radn[alpha_below_zero] -= 1
+       #####  if(np.r_[alpha_g_est < 0.].any()):
+       #####      alpha_below_zero = np.r_[alpha_g_est < 0.]
+       #####      alpha_g_est[alpha_below_zero] += 1
+       #####      anchor_radn[alpha_below_zero] -= 1
 
         # Counting the differences between the estimated radial orders
         # (trying to) make sure there are no duplicates!
@@ -691,7 +692,7 @@ def estimate_radn(obsstar, modes, frot, Pi0, alpha_g=None, use_sequence=True):
         if(alpha_g is None):
             alpha_g_est = [np.nanmean(iradn_alpha - iradn) 
                                 for iradn_alpha, iradn in zip(radn_ag,radn_est)]
-
+        
     else:
         
         sequence = obsstar.seqid(split=True)
