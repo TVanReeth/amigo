@@ -1,42 +1,36 @@
 
 &observations
-    starname = 'KIC0322883'                                                                          # star name
-    patterns = '/lhome/timothyv/Bin/python/amigo/amigo/demo/kepler03228863_spacings.amigo'           # absolute path to the file with detected period spacings
+    starname = 'STARNAME'                        # star name, with "_"-characters replacing any spaces in the name
+    patterns = 'PATTERN_FILENAME'                # path to the file with detected period spacings. The required formatting is described in the documentation.
 /
 
 
-&modes
-    k = 0  1                                                                                         # meridional degrees of the calculated asymptotic models
-    m = 1  0                                                                                         # the (corresponding) azimuthal orders of the calculated asymptotic models
+&modes                                           # possible mode identifications for the (first) observed pattern
+    k = KVAL                                     # meridional degrees k of the calculated asymptotic models
+    m = MVAL                                     # the (corresponding) azimuthal orders m of the calculated asymptotic models
 /
-
-
-&modes
-    k = -2                                                                                           # meridional degrees of the calculated asymptotic models
-    m = -1                                                                                           # the (corresponding) azimuthal orders of the calculated asymptotic models
-/
-
 
 
 &numerical
-    optimisation_method = 'lmfit'                                                                    # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
-    diagnostic = 'spacings'
-    use_sequence = True
+    optimisation_method = 'OPTIM_METHOD'                                                             # method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
+    diagnostic = 'DIAGNOSTIC'
+    use_sequence = USE_SEQ
 /                                                                                              
                                                                                               
                   
 
 
 &star
-    Pi0 = 4000  5600  10                                                                             # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+    Pi0 =  Pi0MIN  Pi0MAX  Pi0STEP                                                                   # minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
 /
 
 
 &rotation
-    frot = 1.13  1.66  0.001                                                                         # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+    frot = FROTMIN FROTMAX FROTSTEP                                                                  # minimum, maximum and step of the evaluated rotation rates (in cycle per day)
 /
 
 
 &output
-
+    interactive = INTERACTIVE
+    output_dir = 'OUTPUT_DIR'
 /

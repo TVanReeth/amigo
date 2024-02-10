@@ -101,6 +101,25 @@ def read_inlist(inlist_filename):
                              there are any (value = True) or not (False). This
                              variable is only used when 
                              diagnostic = 'frequency'.
+            sigma_sampling:  integer
+                             the minimum number of projected data points that has
+                             to be calculated per 1-sigma error margin for each 
+                             parameter, before the iterative model optimisation 
+                             is stopped 
+            grid_scaling:    integer
+                             scaling factor for the required grid size at each 
+                             iteration. At each step, the grid is centered around
+                             the current best solution, with parameter X ranges 
+                             given by: 2 * sigma_sampling * grid_scaling * dX,
+                             where dX is the current step size for the parameter 
+                             X in the grid.
+            cvg_rate:        float
+                             convergence rate of the grid during the iteration.
+                             At each iteration, the parameter step size dX in the
+                             grid is decreased by this factor.
+            interactive:     boolean
+                             indicate if the output has to be shown as a 
+                             Matplotlib figure rather than just saving it
             output_dir:      string
                              path to the directory where the results have to be
                              saved
@@ -128,6 +147,9 @@ def read_inlist(inlist_filename):
         for line in lines:
             
             if(len(line.strip()) == 0):
+                pass
+                
+            elif(line.strip()[0] == '#'):
                 pass
             
             elif(line.strip()[0] == '&'):
@@ -200,6 +222,7 @@ def read_inlist(inlist_filename):
     ### Converting the data from the dictionaries into what is needed for 
     ### the AMiGO program
     output_dir = inlist_params['output']['output_dir']
+    interactive = bool(inlist_params['output']['interactive'])
     
     starname = inlist_params['observations']['starname']
     obsfile = inlist_params['observations']['patterns']
@@ -207,6 +230,9 @@ def read_inlist(inlist_filename):
     method = inlist_params['numerical']['optimisation_method']
     diagnostic = inlist_params['numerical']['diagnostic']
     use_sequence = bool(inlist_params['numerical']['use_sequence'])
+    sig_sampling = float(inlist_params['numerical']['sigma_sampling'])
+    grid_scaling = float(inlist_params['numerical']['grid_scaling'])
+    cvg_rate = float(inlist_params['numerical']['cvg_rate'])
     
     Pi0_bnd = inlist_params['star']['Pi0']
     frot_bnd = inlist_params['rotation']['frot']
@@ -218,13 +244,15 @@ def read_inlist(inlist_filename):
     all_mvals = [np.array(m) for m in product(*all_mvals)]
     
     return gyre_dir, starname, obsfile, method, nthreads, frot_bnd, Pi0_bnd, \
-           all_kvals, all_mvals, diagnostic, use_sequence, output_dir
+           all_kvals, all_mvals, diagnostic, use_sequence, sig_sampling, \
+           grid_scaling, cvg_rate, interactive, output_dir
 
 
 
 
-def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None, 
-                                    chi2=None, deg_freedom=None, output_dir=''):
+def plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha, method='grid', 
+                 sample=None, chi2=None, deg_freedom=None,diagnostic='spacings',
+                                                                 output_dir=''):
     """
         Plotting the observed period-spacing patterns (period spacing as a 
         function of pulsation period) with the best-fitting models. When the 
@@ -245,6 +273,8 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
             fin_Pi0:     astropy quantity
                          buoyancy travel time value of the best-fitting 
                          asymptotic model
+            nvals:       
+            alpha:
             method:      string; optional
                          method used to sample and evaluate the parameter space
                          (grid (default) or lmfit):
@@ -266,6 +296,7 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
                          number of degrees of freedom of the fitted 
                          period-spacing patterns. Required input when 
                          method = 'grid'.
+            diagnostics: 
             output_dir:  string; optional
                          the output directory in which the figures can be saved
         
@@ -273,38 +304,104 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
             N/A
     """
     
-    ### Part 1: plotting the patterns
-    
-    pers, e_pers, dps, e_dps, solid, dashed = obsstar.patterns(to_plot=True)
-    
-    plt.figure()
-    ax = plt.subplot(111)
-    plt.xlabel(r'period ($\sf d$)')
-    plt.ylabel(r'$\Delta$P ($\sf s$)')
-    
-    # plotting the asymptotic models
-    for mode in modes:
+    if(diagnostic == 'spacings'):
         
-        pattern = mode.uniform_pattern(fin_frot, fin_Pi0, unit='days')
+        ### plotting the patterns
+        split_periods = obsstar.period(split=True)
+        split_ampls = obsstar.amplitude(split=True)
+        perran = obsstar.period().ptp()
+        permin = np.amin(obsstar.period()) - 0.05*perran
+        permax = np.amax(obsstar.period()) + 0.05*perran
         
-        # dealing with r-modes...
-        if(mode.kval < 0):
-            pattern = -pattern[::-1]
+        pers, e_pers, dps, e_dps, solid, dashed = obsstar.patterns(to_plot=True)
+        
+        plt.figure()
+        ax_patt = plt.subplot(211)
+        plt.xlabel(r'period ($\sf d$)')
+        plt.ylabel(r'amplitude')
+        ax_sp = plt.subplot(212, sharex=ax_patt)
+        plt.xlabel(r'period ($\sf d$)')
+        plt.ylabel(r'$\Delta$P ($\sf s$)')
+        
+        # plotting the asymptotic models
+        for ialpha,mode in zip(alpha,modes):
+            
+            pattern = mode.uniform_pattern(fin_frot, fin_Pi0, alpha_g=ialpha, unit='days')
+            # dealing with r-modes...
+            if(mode.kval < 0):
+                pattern = -pattern[::-1]
+                
+            ax_patt.vlines(pattern, np.zeros(len(pattern)), 
+                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors='r')
+            ax_sp.plot(pattern[:-1], np.diff(pattern.to(u.s)), 'r-')
+    
+        # plotting the observations
+        for per,ampl in zip(split_periods,split_ampls):
+            ax_patt.vlines(per, np.zeros(len(per)), ampl, colors='k',lw=1.5)
+            
+        spmin = 10000000.*u.s
+        spmax = 0.*u.s
+        
+        for per,eper,dp,edp,line,dash in zip(pers,e_pers,dps,e_dps,solid,dashed):
+        
+            plot_line = LineCollection(line,linewidths=1.,linestyles='-',colors='k')
+            plot_dash = LineCollection(dash,linewidths=1.,linestyles=':',colors='k')
+            ax_sp.add_collection(plot_line)
+            ax_sp.add_collection(plot_dash)
 
-        plt.plot(pattern[:-1], np.diff(pattern.to(u.s)), 'r-')
-    
-    # plotting the observations
-    for per,eper,dp,edp,line,dash in zip(pers,e_pers,dps,e_dps,solid,dashed):
-        
-        plot_line = LineCollection(line,linewidths=1.,linestyles='-',colors='k')
-        plot_dash = LineCollection(dash,linewidths=1.,linestyles=':',colors='k')
-        ax.add_collection(plot_line)
-        ax.add_collection(plot_dash)
-
-        plt.errorbar(per,dp.to(u.s),xerr=eper,yerr=edp.to(u.s),
+            ax_sp.errorbar(per,dp.to(u.s),xerr=eper,yerr=edp.to(u.s),
                                       fmt='k.',mfc='k',ecolor='k',elinewidth=1.)
+            if(spmin > np.amin(dp.to(u.s)-edp.to(u.s))):
+                spmin = np.amin(dp.to(u.s)-edp.to(u.s))
+            if(spmax < np.amax(dp.to(u.s)+edp.to(u.s))):
+                spmax = np.amax(dp.to(u.s)+edp.to(u.s))
+        
+        spran = spmax - spmin
+        ax_sp.set_ylim(max(0.,spmin.value-0.05*spran.value), spmax.value+0.05*spran.value)
+        ax_patt.set_ylim(0., np.amax(obsstar.amplitude())*1.1)
+        plt.xlim(permin.value, permax.value)
     
+    else:
+        
+        ### plotting the patterns
+        split_freqs = obsstar.frequency(split=True)
+        split_efreqs = obsstar.e_frequency(split=True)
+        split_ampls = obsstar.amplitude(split=True)
+        freqran = obsstar.frequency().ptp()
+        freqmin = np.amin(obsstar.frequency()) - 0.05*freqran
+        freqmax = np.amax(obsstar.frequency()) + 0.05*freqran
+        
+        plt.figure()
+        ax_patt = plt.subplot(211)
+        plt.xlabel(r'frequency ($\sf d^{-1}$)')
+        plt.ylabel(r'amplitude')
+        ax_diff = plt.subplot(212, sharex=ax_patt)
+        plt.xlabel(r'frequency ($\sf d^{-1}$)')
+        plt.ylabel(r'$\delta$f ($\sf d^{-1}$)')
+        
+        
+        for mode,freq,efreq,ampl,radn, ialpha in zip(modes,split_freqs,split_efreqs,split_ampls,nvals, alpha):
+            # plotting the asymptotic models
+            pattern = mode.uniform_pattern(fin_frot, fin_Pi0, alpha_g=ialpha)
+            # dealing with r-modes...
+            if(mode.kval < 0):
+                pattern = -pattern
+                
+            ax_patt.vlines(pattern, np.zeros(len(pattern)), 
+                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors='r')
+
+            ax_diff.plot((freqmin.value,freqmax.value), (0., 0.), 'r--')
+        
+            # plotting the observations
+            ax_patt.vlines(freq, np.zeros(len(freq)), ampl, colors='k',lw=1.5)
+            ax_diff.errorbar(freq, freq-np.interp(np.array(radn),mode.nvals,pattern),
+                             xerr=efreq, yerr=efreq, fmt='k.', mfc='k', ecolor='k', elinewidth=1.)
+
+        ax_patt.set_ylim(0., np.amax(obsstar.amplitude())*1.1)
+        plt.xlim(freqmin.value, freqmax.value)
+        
     plt.tight_layout()
+    
     
     if(os.path.exists(output_dir)):
         mode_id_str = ''
@@ -327,13 +424,13 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
         uni_Pi0 = np.unique(sample['Pi0'])
         
         chi2_plot = np.r_[chi2 <= np.amin(chi2)*redchi2_cutoff]
-        extent_plot = (np.amin(uni_frot),np.amax(uni_frot),
-                                              np.amin(uni_Pi0),np.amax(uni_Pi0))
         
         chi2_frot = np.array([np.nanmin(chi2[np.r_[sample['f_rot'] == ifrot]]) 
                                                          for ifrot in uni_frot])
         chi2_Pi0 = np.array([np.nanmin(chi2[np.r_[sample['Pi0'] == iPi0]]) 
                                                            for iPi0 in uni_Pi0])
+        extent_plot = (np.amin(uni_frot),np.amax(uni_frot),
+                                              np.amin(uni_Pi0),np.amax(uni_Pi0))
 
         plt.figure()
         plt.subplot(311)
@@ -347,6 +444,7 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
         
         ax3 = plt.subplot(313)
         ax3.set_facecolor("white")
+        
         im = plt.imshow(loggrid, extent=extent_plot, interpolation='bicubic', 
                        origin='lower', aspect="auto", cmap=plt.get_cmap('gray'))
         levels = [np.amin(chi2)*chi2dist.ppf(0.99,deg_freedom)/deg_freedom]
@@ -359,7 +457,10 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, method='grid', sample=None,
         CS = plt.contour(loggrid, np.log10(np.array(levels)), colors='r', 
                                                linewidths=2, extent=extent_plot)
         plt.plot([fin_frot.value], [fin_Pi0.value], 'wx')
-
+        
+        plt.xlim(np.amin(sample['f_rot'][chi2_plot]),np.amax(sample['f_rot'][chi2_plot]))
+        plt.ylim(np.amin(sample['Pi0'][chi2_plot]),np.amax(sample['Pi0'][chi2_plot]))
+        
         cbar = plt.colorbar(im)
         cbar.set_label(r'log $\sf\chi^2$')
         plt.xlabel(r'$\sf f_{\sf rot}$ ($\sf d^{-1}$)')
@@ -386,8 +487,9 @@ if __name__ == "__main__":
     # read in the chosen parameters and relevant filenames in the inlist
     inlist_filename = sys.argv[1]
     
-    gyre_dir, star, obsfile, method, nthreads, frot_bnd, Pi0_bnd, \
-    all_kvals, all_mvals, diagnostic, use_sequence, output_dir = read_inlist(inlist_filename)
+    gyre_dir, star, obsfile, method, nthreads, frot_bnd, Pi0_bnd, all_kvals, \
+    all_mvals, diagnostic, use_sequence, sig_sampling, grid_scaling, cvg_rate, \
+                          interactive, output_dir = read_inlist(inlist_filename)
     
     Pi0min  = Pi0_bnd[0]
     Pi0max  = Pi0_bnd[1]
@@ -409,8 +511,8 @@ if __name__ == "__main__":
     if(os.path.exists(output_dir)):
         if not os.path.exists(f'{output_dir}/{obsstar.starname}'):
             os.makedirs(f'{output_dir}/{obsstar.starname}')
-        output_log = open(f'{output_dir}/{obsstar.starname}/\
-                            {obsstar.starname}_modelling.log','w')
+        output_log = open(f'{output_dir}/{obsstar.starname}/' + \
+                          f'{obsstar.starname}_modelling.log','w')
     else:
         output_log = None
     
@@ -447,23 +549,25 @@ if __name__ == "__main__":
                                    alpha_in=alpha_in, use_sequence=use_sequence,
                                    nthreads=nthreads)
 
-            plot_results(obsstar, modes, fin_frot, fin_Pi0, method=method, 
-                         sample=sample, chi2=chi2, deg_freedom=deg_freedom,
+            plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha_out,
+                         method=method, sample=sample, chi2=chi2, 
+                         deg_freedom=deg_freedom, diagnostic=diagnostic, 
                          output_dir=output_dir)
     
         elif(method == 'iterative'):
             fin_frot, fin_e_frot, fin_Pi0, fin_e_Pi0, alpha_out, e_alpha, \
             min_chi2red, nvals, sample, chi2, deg_freedom = \
-                 fit.fit_iterative(obsstar, modes, diagnostic=diagnostic, 
-                                   Pi0min=Pi0min,Pi0max=Pi0max,dPi0=dPi0,
-                                   frotmin=frotmin,frotmax=frotmax,dfrot=dfrot, 
-                                   alpha_in=alpha_in, use_sequence=use_sequence,
-                                   nthreads=nthreads, sigma_sampling=10, 
-                                   grid_scaling=5, cvg_rate=1.5, 
-                                   output_log=output_log)
+                fit.fit_iterative(obsstar, modes, diagnostic=diagnostic, 
+                                  Pi0min=Pi0min,Pi0max=Pi0max,dPi0=dPi0,
+                                  frotmin=frotmin,frotmax=frotmax,dfrot=dfrot, 
+                                  alpha_in=alpha_in, use_sequence=use_sequence,
+                                  nthreads=nthreads, sigma_sampling=sig_sampling,
+                                  grid_scaling=grid_scaling, cvg_rate=cvg_rate, 
+                                  output_log=output_log)
 
-            plot_results(obsstar, modes, fin_frot, fin_Pi0, method=method, 
-                         sample=sample, chi2=chi2, deg_freedom=deg_freedom, 
+            plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha_out, 
+                         method=method, sample=sample, chi2=chi2,
+                         deg_freedom=deg_freedom, diagnostic=diagnostic, 
                          output_dir=output_dir)
     
         else:
@@ -474,20 +578,34 @@ if __name__ == "__main__":
                                    frotmin=frotmin, frotmax=frotmax, 
                                    alpha_in=alpha_in, use_sequence=use_sequence,
                                    nthreads=nthreads)
-        
-            plot_results(obsstar, modes, fin_frot, fin_Pi0, method=method, 
+            
+            plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha_out, 
+                         method=method, diagnostic=diagnostic, 
                          output_dir=output_dir)
     
         # Printing the final results
         print(f"    chi2_red = {min_chi2red}")
         print(f"    f_rot: {fin_frot.value} +/- {fin_e_frot.value} c/d")
-        print(f"    Pi0: {fin_Pi0.value} +/- {fin_e_Pi0.value} s\n")
+        print(f"    Pi0: {fin_Pi0.value} +/- {fin_e_Pi0.value} s")
+        
+        if(diagnostic == 'frequency'):
+            for ii, ialpha, e_ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out, e_alpha):
+                print(f"    alpha{int(ii)}: {ialpha} +/- {e_ialpha}")
+        print("\n")
         
         if(output_log is not None):
             output_log.write(f"chi2_red = {min_chi2red}\n")
             output_log.write(f"f_rot: {fin_frot.value} +/- {fin_e_frot.value} c/d\n")
-            output_log.write(f"Pi0: {fin_Pi0.value} +/- {fin_e_Pi0.value} s\n\n")
+            output_log.write(f"Pi0: {fin_Pi0.value} +/- {fin_e_Pi0.value} s\n")
+        
+            if(diagnostic == 'frequency'):
+                for ii, ialpha, e_ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out, e_alpha):
+                    output_log.write(f"    alpha{int(ii)}: {ialpha} +/- {e_ialpha}\n")
+            output_log.write("\n")
     
-    if not os.path.exists(output_dir):
+    if(os.path.exists(output_dir)):
+        output_log.close()
+        
+    if(interactive | (not os.path.exists(output_dir))):
         plt.show()
         
