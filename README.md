@@ -4,12 +4,12 @@ AMiGO: Asymptotic Modelling of Gravity-mode Oscillations
 Author: Timothy Van Reeth
         timothy.vanreeth@kuleuven.be
 
-AMiGO (Asymptotic Modelling of G-mode Oscillations) is a python package to (i) cal-
-culate theoretical asymptotic g-mode period-spacing patterns for rotating stars and (ii)
+AMiGO (Asymptotic Modelling of G-mode Oscillations) is a python package to (i) calculate
+ theoretical asymptotic g-mode period-spacing patterns for rotating stars and (ii)
 measure near-core rotation rates of observed stars by analysing their g-mode pulsations.
 In AMiGO, (i) any mode trapping caused by the chemical structure of the star is ignored,
 and (ii) it is assumed that the g-mode pulsations are in the asymptotic regime, that is, 
-have pulsation frequencies << N , where N is the Brunt\"ais \"al \"a frequency. Moreover,
+have pulsation frequencies << N , where N is the Bruntaisala frequency. Moreover,
 the Traditional Approximation of Rotation (TAR) is used: the horizontal component of the  
 rotationvector is ignored in the equation of motion. Finally, unless otherwise specified,
 the star is assumed to be uniformly rotating and spherically symmetric.
@@ -45,8 +45,8 @@ To install AMIGO, you need to:
    
 3. When the prerequisites are met, the git repository can be cloned into a directory
    <dir> of your choice by typing these commands into a terminal:
-        $ cd <dir>
-        $ git clone https://github.com/TVanReeth/amigo.git amigo
+           $ cd <dir>
+           $ git clone https://github.com/TVanReeth/amigo.git amigo
         
 4. Activate the python virtual environment in which you want to install the required
    python packages. To avoid possible conflicting dependencies, we advice to build and
