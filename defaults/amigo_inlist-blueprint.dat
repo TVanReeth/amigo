@@ -1,0 +1,43 @@
+
+&observations
+    starname = 'STARNAME'                        # string: star name, with "_"-characters replacing any spaces in the name
+    patterns = 'PATTERN_FILENAME'                # string: path to the file with detected period spacings. The required formatting is described in the documentation.
+/
+
+
+&modes                                           # possible mode identifications for the (first) observed pattern
+    k = KVAL                                     # integer: meridional degrees k of the calculated asymptotic models
+    m = MVAL                                     # integer: the (corresponding) azimuthal orders m of the calculated asymptotic models
+/
+
+
+&numerical
+    optimisation_method = 'OPTIM_METHOD'         # string: method used to sample and evaluate the parameter space ('grid', 'iterative' or 'lmfit')
+    diagnostic = 'DIAGNOSTIC'                    # string: which diagnostic is used to evaluate the observed period-spacing patterns ('spacings' or 'frequency')
+    use_sequence = USE_SEQ                       # boolean: do we have enough information to fill gaps in the observed pattern(s), if any? Only used when diagnostic is 'frequency'.
+    sigma_sampling = N_SIGMA_SAMPLING            # Only used when optimisation_method is 'iterative'. Minimum number of projected data points that is calculated per 1-sigma error margin.
+    grid_scaling = GRID_SCALING                  # Only used when optimisation_method is 'iterative'. scaling factor for the required grid size at each iteration. 
+                                                 # At each step, the grid is centered around the current best solution, with parameter X ranges given by: 2 * sigma_sampling * grid_scaling * dX,
+                                                 # where dX is the current step size for the parameter X in the grid.
+    cvg_rate = CONVERGENCE_RATE                  # Convergence rate of the grid during the iteration, only used when optimisation_method is 'iterative'. 
+                                                 # At each iteration, the parameter step size dX in the grid is decreased by this factor.
+/                                                                                              
+                                                                                              
+                  
+
+
+&star
+    Pi0 =  Pi0MIN  Pi0MAX  Pi0STEP               # floats: minimum, maximum and step of the evaluated buoyancy travel times (in seconds)
+/
+
+
+&rotation
+    frot = FROTMIN FROTMAX FROTSTEP              # floats: minimum, maximum and step of the evaluated rotation rates (in cycle per day)
+/
+
+
+&output
+    interactive = INTERACTIVE                    # boolean: show the output as a Matplotlib figure rather than just saving it
+    output_dir = 'OUTPUT_DIR'                    # string: path to the directory in which the results will be saved (in a subdirectory <OUTPUT_DIR>/<STARNAME>/)
+/
+                            
