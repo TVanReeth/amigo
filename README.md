@@ -63,7 +63,7 @@ To install AMIGO, you need to:
            $ poetry install
 ```
    
-7. Modify the parameters in the configuration file <dir>/amigo/config.dat as needed.
+7. Modify the parameters in the configuration file `<dir>/amigo/config.dat` as needed.
 
 8. Optional: include the following alias in your `~/.bashrc` file:
 ```
@@ -77,20 +77,12 @@ been defined.
 Using AMIGO
 -----------
 
-To run AMIGO, you need to:
-1. activate the python environment.
-2. adapt the contents of the inlist UserInput_rotation.dat to your use case. 
-   Most importantly, the path to the GYRE directory has to be modified.
-3. enter the terminal command: 
-       python computate_rotation.py
+AMiGO can be used as a standalone software package to model observed period-spacing patterns,
+or (selected) subroutines can be called from a python script. 
 
-In the subdirectory /demo you can find:
-- a backup of the inlist UserInput_rotation.dat for the demo.
-- an example of a file with two period-spacing patterns, used in the demo.
-- an additional python script (demo_plot_pattern.py) which illustrates how the 
-  code can be used to calculate and plot a single, specified g-mode 
-  period-spacing pattern.
-
+Various use cases of AMiGO are demonstrated in the tutorials subdirectory. In tutorials 1 to 3,
+AMiGO is run as a standalone software package, while in tutorials 4 to 7 selected subroutines
+are called. It is assumed that the python environment in which AMiGO was installed, is activated.
 
 Acknowledgements
 ----------------
@@ -134,5 +126,7 @@ different submodules. These include:
    https://ui.adsabs.harvard.edu/abs/2022A%26A...662A..58V/abstract
 
 Moreover, please also fulfill the acknowledgement requirements of the GYRE
-software package (https://gyre.readthedocs.io/en/stable/), since AMIGO relies
-on it.
+software package (https://gyre.readthedocs.io/en/stable/). We are grateful
+to Rich Townsend and all its other developers. Their hard work has allowed 
+us to develop the AMiGO package.
+
