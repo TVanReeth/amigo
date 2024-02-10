@@ -4,23 +4,67 @@ AMiGO: Asymptotic Modelling of Gravity-mode Oscillations
 Author: Timothy Van Reeth
         timothy.vanreeth@kuleuven.be
 
-An object-oriented python module to help you to do forward asteroseismic 
-modelling of observed (patterns of) gravito-inertial modes, using asymptotic
-models.
+AMiGO (Asymptotic Modelling of G-mode Oscillations) is a python package to (i) cal-
+culate theoretical asymptotic g-mode period-spacing patterns for rotating stars and (ii)
+measure near-core rotation rates of observed stars by analysing their g-mode pulsations.
+In AMiGO, (i) any mode trapping caused by the chemical structure of the star is ignored,
+and (ii) it is assumed that the g-mode pulsations are in the asymptotic regime, that is, 
+have pulsation frequencies << N , where N is the Brunt\"ais \"al \"a frequency. Moreover,
+the Traditional Approximation of Rotation (TAR) is used: the horizontal component of the  
+rotationvector is ignored in the equation of motion. Finally, unless otherwise specified,
+the star is assumed to be uniformly rotating and spherically symmetric.
+
+AMiGO combines multiple algorithms, which have been described in separate scientific
+publications (listed below). We refer the user to these publications and the
+references therein for a more detailed of the scientific framework(s).
+
+AMiGO allows the user to:
+* determine the mode identification of observed g-mode period spacing patterns.
+* measure (uniform) near-core rotation rates of observed stars by fitting their observed
+g-mode period spacing patterns.
+* measure (uniform) near-core rotation rates of observed stars by fitting individual ob-
+served g-mode periods.
+* calculate the effects of radially differential rotation on g-mode period-spacing patterns.
+* account for the effects of the weak centrifugal acceleration on g-mode pulsation periods
+in a uniformly rotating star.
 
 
 Installation instructions
 -------------------------
 
 To install AMIGO, you need to:
-1. download the source code from https://github.com/TVanReeth/amigo.
-2. install the required python environment. AMIGO requires python >=3.9 and 
+1. install the required python environment. AMIGO requires python >=3.9 and 
    <=3.12, and uses Poetry (https://python-poetry.org/docs/) to manage package 
-   dependencies.
-3. ensure you have access to the source code of a recent version of GYRE 
+   dependencies. You can combine this with the virtual Python environment manager of your
+   choice, e.g., Conda (https://conda.io/projects/conda/en/latest/index.html).
+
+2. ensure you have access to the source code of a recent version of GYRE 
    (v6.x or later; https://gyre.readthedocs.io/en/stable/). It does not have to
    be installed, but AMIGO relies on some of the data files that are included 
    with the GYRE source code.
+   
+3. When the prerequisites are met, the git repository can be cloned into a directory
+   <dir> of your choice by typing these commands into a terminal:
+        $ cd <dir>
+        $ git clone https://github.com/TVanReeth/amigo.git amigo
+        
+4. Activate the python virtual environment in which you want to install the required
+   python packages. To avoid possible conflicting dependencies, we advice to build and
+   activate a custom environment. E.g., with conda this can be done by typing:
+        $ conda create -n amigo_py python=3.9
+        $ conda activate amigo_py
+   
+5. Use Poetry to install the required Python packages with all their dependencies.
+        $ cd amigo
+        $ poetry install
+   
+6. Modify the parameters in the configuration file <dir>/amigo/config.dat as needed.
+
+7. Optional: include the following alias in your ~/.bashrc file:
+        alias amigo=’python <dir>/amigo/amigo/compute_rotation.py’
+
+Throughout the rest of this documentation, it is assumed that this alias command has
+been defined.
 
 
 Using AMIGO
