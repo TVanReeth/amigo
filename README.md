@@ -43,8 +43,7 @@ To install AMIGO, you need to:
    be installed, but AMIGO relies on some of the data files that are included 
    with the GYRE source code.
    
-3. When the prerequisites are met, the git repository can be cloned into a directory
-   <dir> of your choice by typing these commands into a terminal:
+3. When the prerequisites are met, the git repository can be cloned into a directory <dir> of your choice by typing these commands into a terminal:
 ```
            $ cd <dir>
            $ git clone https://github.com/TVanReeth/amigo.git amigo
@@ -53,17 +52,23 @@ To install AMIGO, you need to:
 4. Activate the python virtual environment in which you want to install the required
    python packages. To avoid possible conflicting dependencies, we advice to build and
    activate a custom environment. E.g., with conda this can be done by typing:
-        a. $ conda create -n amigo_py python=3.9
-        b. $ conda activate amigo_py
+```
+           $ conda create -n amigo_py python=3.9
+           $ conda activate amigo_py
+```
    
 5. Use Poetry to install the required Python packages with all their dependencies.
-        $ cd amigo
-        $ poetry install
+```
+           $ cd amigo
+           $ poetry install
+```
    
-6. Modify the parameters in the configuration file <dir>/amigo/config.dat as needed.
+7. Modify the parameters in the configuration file <dir>/amigo/config.dat as needed.
 
-7. Optional: include the following alias in your ~/.bashrc file:
+8. Optional: include the following alias in your `~/.bashrc` file:
+```
         alias amigo=’python <dir>/amigo/amigo/compute_rotation.py’
+```
 
 Throughout the rest of this documentation, it is assumed that this alias command has
 been defined.
