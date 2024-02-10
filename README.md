@@ -45,8 +45,8 @@ To install AMIGO, you need to:
    
 3. When the prerequisites are met, the git repository can be cloned into a directory
    <dir> of your choice by typing these commands into a terminal:
-           - $ cd <dir>
-           - $ git clone https://github.com/TVanReeth/amigo.git amigo
+a. $ cd <dir>
+b. $ git clone https://github.com/TVanReeth/amigo.git amigo
         
 4. Activate the python virtual environment in which you want to install the required
    python packages. To avoid possible conflicting dependencies, we advice to build and
