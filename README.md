@@ -1,3 +1,5 @@
+![AMiGO logo](https://github.com/TVanReeth/amigo/blob/master/doc/logo_white-bkg.png?raw=true)
+
 AMiGO: Asymptotic Modelling of Gravity-mode Oscillations
 ========================================================
 
