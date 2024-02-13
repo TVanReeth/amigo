@@ -114,7 +114,7 @@ if __name__ == "__main__":
     nthreads = 8       # the number of threads used in the parallellisation
     
     
-    # Geometric mode identifications (n,k,m) for the g-modes, where n is the 
+    # Geometric mode identifications (n,Roche,m) for the g-modes, where n is the 
     # radial order, k is the meridional degree), and m is the azimuthal order. 
     k1 = 0      # meridional degree of the first pattern
     m1 = 1      # azimuthal order of the first pattern
@@ -181,8 +181,8 @@ if __name__ == "__main__":
         pseudo_rad = star.centrifugal_radius(mu)
         pseudo_N2 = star.centrifugal_N2profile(mu)
         clr = f'{np.round(0.8 * (1. - imu/len(mus)),3)}'
-        txtlbl = r'$\Omega_{\sf rot} = {omrot_frac}\Omega_{\sf crit,K}$, ' \
-                 + r'$\mu = $'+f'{mulbls[imu]}'
+        txtlbl =   r'$\Omega_{\sf rot}$' + f' = {omrot_frac}' \
+                 + r'$\Omega_{\sf crit,Roche}$, $\mu = $' + f'{mulbls[imu]}'
         slct = np.r_[pseudo_N2 > 0.]
         plt.plot(pseudo_rad[slct],np.log10(pseudo_N2.value[slct]), c=clr, \
                                                 label=txtlbl, zorder=int(9-imu))
