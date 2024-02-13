@@ -11,7 +11,7 @@ In AMiGO, (i) any mode trapping caused by the chemical structure of the star is 
 and (ii) it is assumed that the g-mode pulsations are in the asymptotic regime, that is, 
 have pulsation frequencies << N , where N is the Bruntaisala frequency. Moreover,
 the Traditional Approximation of Rotation (TAR) is used: the horizontal component of the  
-rotationvector is ignored in the equation of motion. Finally, unless otherwise specified,
+rotation vector is ignored in the equation of motion. Finally, unless otherwise specified,
 the star is assumed to be uniformly rotating and spherically symmetric.
 
 AMiGO combines multiple algorithms, which have been described in separate scientific
