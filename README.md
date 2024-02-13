@@ -10,7 +10,7 @@ measure near-core rotation rates of observed stars by analysing their g-mode pul
 In AMiGO, (i) any mode trapping caused by the chemical structure of the star is ignored,
 and (ii) it is assumed that the g-mode pulsations are in the asymptotic regime, that is, 
 have pulsation frequencies << N , where N is the Bruntaisala frequency. Moreover,
-the Traditional Approximation of Rotation (TAR) is used: the horizontal component of the  
+the Traditional Approximation of Rotation (TAR) is used: the horizontal component of the 
 rotation vector is ignored in the equation of motion. Finally, unless otherwise specified,
 the star is assumed to be uniformly rotating and spherically symmetric.
 
