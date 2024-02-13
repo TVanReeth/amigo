@@ -84,6 +84,9 @@ Various use cases of AMiGO are demonstrated in the tutorials subdirectory. In tu
 AMiGO is run as a standalone software package, while in tutorials 4 to 7 selected subroutines
 are called. It is assumed that the python environment in which AMiGO was installed, is activated.
 
+To learn more about using AMiGO, we refer the user to these tutorials and the Amigo-documentation.pdf 
+file in the /doc subdirectory.
+
 Acknowledgements
 ----------------
 
