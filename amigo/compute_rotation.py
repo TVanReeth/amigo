@@ -591,6 +591,9 @@ if __name__ == "__main__":
         if(diagnostic == 'frequency'):
             for ii, ialpha, e_ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out, e_alpha):
                 print(f"    alpha{int(ii)}: {ialpha} +/- {e_ialpha}")
+        else:
+            for ii, ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out):
+                print(f"    estimated alpha{int(ii)}: {ialpha}")
         print("\n")
         
         if(output_log is not None):
@@ -601,6 +604,9 @@ if __name__ == "__main__":
             if(diagnostic == 'frequency'):
                 for ii, ialpha, e_ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out, e_alpha):
                     output_log.write(f"    alpha{int(ii)}: {ialpha} +/- {e_ialpha}\n")
+            else:
+                for ii, ialpha in zip(np.arange(1,1+len(alpha_out)), alpha_out):
+                    output_log.write(f"    estimated alpha{int(ii)}: {ialpha}\n")
             output_log.write("\n")
     
     if(os.path.exists(output_dir)):
