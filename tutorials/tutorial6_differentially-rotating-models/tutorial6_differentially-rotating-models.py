@@ -244,12 +244,12 @@ if __name__ == "__main__":
     # the rotation profiles
     plt.subplot(311) 
     plt.plot((star.radius[0].value, star.radius[-1].value), \
-          (frot_s.value, frot_s.value), 'k-', c='0.8', label=r'$\Delta$f = 0.0')
+          (frot_s.value, frot_s.value), 'k-', c='0.8', label=r'$\delta$f = 0.0')
     
     for ii, i_df, frot_prof in zip(np.arange(1.,1.+len(df)), df, frot_profiles):
         clr = f'{np.round(0.8 * (1. - ii/len(df)),3)}'
         plt.plot(star.radius, frot_prof, 'k-', c=clr, \
-                                       label=fr'$\Delta$f = {np.round(i_df,2)}')
+                                       label=fr'$\delta$f = {np.round(i_df,2)}')
     plt.xlim(star.radius[0].value, star.radius[-1].value)
     
     plt.legend(loc = 'upper right')
@@ -321,9 +321,9 @@ if __name__ == "__main__":
     # the rotation profiles
     plt.subplot(311)
     plt.plot((star.radius[0].value, star.radius[-1].value), \
-          (frot_s.value, frot_s.value), 'k-', c='0.8', label=r'$\Delta$f = 0.0')
+          (frot_s.value, frot_s.value), 'k-', c='0.8', label=r'$\delta$f = 0.0')
     plt.plot(star.radius, frot_prof, 'k-', c='0.4', \
-                                       label=fr'$\Delta$f = {np.round(df_s,1)}')
+                                       label=fr'$\delta$f = {np.round(df_s,1)}')
     
     frot_expansion = frot_s + dfrot_s*(star.radius-rs) \
                                              + 0.5*d2frot_s*(star.radius-rs)**2.
