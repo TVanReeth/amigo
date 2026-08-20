@@ -38,7 +38,7 @@ class gravity_modes(object):
             
             Parameters:
                 gyre_dir: string
-                          The GYRE 6.x (or higher) installation directory.
+                          The GYRE 9.x (or higher) installation directory.
                 kval:     integer
                           Part of the mode identification of the pulsation 
                           pattern. For gravito-inertial modes with an equivalent
@@ -94,14 +94,24 @@ class gravity_modes(object):
         infile = f'{gyre_dir}/data/tar/tar_fit.m{mstr}.k{kstr}.h5'
         
         sys.path.append(gyre_dir+'/src/tar/')
-        import gyre_tar_fit
-       # import gyre_cheb_fit
         
-        tf = gyre_tar_fit.TarFit.load(infile)
+        # Find gyre file name (beware - this file name has changed in gyre
+        # version 7.2, which results in a bug until GYRE version 8.0,
+        # fixed from gyre version 8.1 onward)
+        try:
+            import gyre_tar_fit as gyre_tf
+        except ModuleNotFoundError:
+            try:
+                import tar_fit as gyre_tf
+            except ModuleNotFoundError:
+                raise ModuleNotFoundError("Problem with GYRE file import. " +
+                                          "Beware: GYRE versions 7.2 to 8.0 " +
+                                          "are not compatible with Amigo. " +
+                                          "Download a newer version of GYRE at https://github.com/rhdtownsend/gyre")
+        tf = gyre_tf.TarFit.load(infile)
         lam_fun = np.vectorize(tf.lam)
         
         return lam_fun
-    
     
     
     def _sample_laplacegrid(self,spinmin=None,spinmax=1000.,spindensity=1.):

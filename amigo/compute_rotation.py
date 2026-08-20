@@ -193,7 +193,17 @@ def read_inlist(inlist_filename):
             
         return params
     
-        
+    def check_parameters(key, value, good):
+        """
+            Subroutine to check whether the user setting is among the
+            excepted values.
+        """
+        if value not in good:
+            good_str = ', '.join(good)
+            err1 = f'The chosen {key} is not among the excepted values.'
+            err2 = f'Must be in {good_str}. Your setting is {value}'
+            raise ValueError(f'{err1} {err2}')
+    
     
     ### Reading in the main config file
     file = open(config_file,'r')
@@ -226,9 +236,10 @@ def read_inlist(inlist_filename):
     
     starname = inlist_params['observations']['starname']
     obsfile = inlist_params['observations']['patterns']
-    
     method = inlist_params['numerical']['optimisation_method']
+    check_parameters('optimisation_method', method, ['grid', 'iterative', 'lmfit'])
     diagnostic = inlist_params['numerical']['diagnostic']
+    check_parameters('diagnostic', diagnostic, ['spacings', 'frequency'])
     use_sequence = bool(inlist_params['numerical']['use_sequence'])
     sig_sampling = float(inlist_params['numerical']['sigma_sampling'])
     grid_scaling = float(inlist_params['numerical']['grid_scaling'])
@@ -303,7 +314,12 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha, method='grid',
         Returns:
             N/A
     """
-    
+    col = ['red', 'tab:blue', 'tab:green', 'tab:purple']
+    while len(modes) > len(col):
+        # In case of more than 4 patterns add just red.
+        # That many patterns are very rare
+        col.append('r')
+        
     if(diagnostic == 'spacings'):
         
         ### plotting the patterns
@@ -324,6 +340,7 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha, method='grid',
         plt.ylabel(r'$\Delta$P ($\sf s$)')
         
         # plotting the asymptotic models
+        i = 0
         for ialpha,mode in zip(alpha,modes):
             
             pattern = mode.uniform_pattern(fin_frot, fin_Pi0, alpha_g=ialpha, unit='days')
@@ -332,8 +349,9 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha, method='grid',
                 pattern = -pattern[::-1]
                 
             ax_patt.vlines(pattern, np.zeros(len(pattern)), 
-                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors='r')
-            ax_sp.plot(pattern[:-1], np.diff(pattern.to(u.s)), 'r-')
+                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors=col[i])
+            ax_sp.plot(pattern[:-1], np.diff(pattern.to(u.s)), '-', c=col[i])
+            i += 1
     
         # plotting the observations
         for per,ampl in zip(split_periods,split_ampls):
@@ -379,23 +397,24 @@ def plot_results(obsstar, modes, fin_frot, fin_Pi0, nvals, alpha, method='grid',
         plt.xlabel(r'frequency ($\sf d^{-1}$)')
         plt.ylabel(r'$\delta$f ($\sf d^{-1}$)')
         
-        
+        i = 0
         for mode,freq,efreq,ampl,radn, ialpha in zip(modes,split_freqs,split_efreqs,split_ampls,nvals, alpha):
             # plotting the asymptotic models
             pattern = mode.uniform_pattern(fin_frot, fin_Pi0, alpha_g=ialpha)
             # dealing with r-modes...
             if(mode.kval < 0):
                 pattern = -pattern
-                
-            ax_patt.vlines(pattern, np.zeros(len(pattern)), 
-                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors='r')
 
-            ax_diff.plot((freqmin.value,freqmax.value), (0., 0.), 'r--')
+            ax_patt.vlines(pattern, np.zeros(len(pattern)), 
+                  np.ones(len(pattern))*np.amax(obsstar.amplitude())*1.1, colors=col[i])
+
+            ax_diff.plot((freqmin.value,freqmax.value), (0., 0.), '--', c=col[i])
         
             # plotting the observations
             ax_patt.vlines(freq, np.zeros(len(freq)), ampl, colors='k',lw=1.5)
             ax_diff.errorbar(freq, freq-np.interp(np.array(radn),mode.nvals,pattern),
                              xerr=efreq, yerr=efreq, fmt='k.', mfc='k', ecolor='k', elinewidth=1.)
+            i += 1
 
         ax_patt.set_ylim(0., np.amax(obsstar.amplitude())*1.1)
         plt.xlim(freqmin.value, freqmax.value)
