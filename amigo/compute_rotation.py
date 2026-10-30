@@ -154,6 +154,10 @@ def read_inlist(inlist_filename):
             gyre_dir = line.split('=')[1].split('#')[0].strip()
         elif(line.split('=')[0].strip() == 'nthreads'):
             nthreads = int(line.split('=')[1].split('#')[0].strip())
+	gyre_dir = os.path.expandvars(gyre_dir_config)
+	
+	if gyre_dir.startswith('$'):
+    	raise ValueError(f"Environment variable '{gyre_dir}' is not set on this system. Please update config file.")
 
     ### A dictionary of all the possible sections in the inlist, except 'modes'
     inlist_params = {'observations':{},'numerical':{},'star':{}, 'rotation':{},\
