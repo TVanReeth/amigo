@@ -41,9 +41,9 @@ To install AMIGO, you need to:
    choice, e.g., Conda (https://conda.io/projects/conda/en/latest/index.html).
 
 2. ensure you have access to the source code of a recent version of GYRE 
-   (v6.x or later; https://gyre.readthedocs.io/en/stable/). It does not have to
+   (v9.x or later; https://gyre.readthedocs.io/en/stable/). It does not have to
    be installed, but AMIGO relies on some of the data files that are included 
-   with the GYRE source code.
+   with the GYRE source code. Beware: GYRE versions 7.2 to 8.0 are not compatible with Amigo.
    
 3. When the prerequisites are met, the git repository can be cloned into a directory <dir> of your choice by typing these commands into a terminal:
 ```

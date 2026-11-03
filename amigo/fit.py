@@ -16,7 +16,7 @@ from lmfit import Parameters, Minimizer
 import astropy
 import astropy.units as u
 
-import grid
+from . import grid
 
 
 
